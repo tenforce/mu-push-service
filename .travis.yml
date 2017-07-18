@@ -1,0 +1,13 @@
+sudo: required
+
+services:
+  - docker
+
+before_script:
+  - ./ci/start.sh
+
+after_script:
+  - ./ci/stop.sh
+
+script:
+  - ./ci/run-tests.sh bash -c "tox && pip install codecov && codecov --token=${CODECOV_TOKEN?}"
