@@ -9,14 +9,8 @@ logger = logging.getLogger(__name__)
 async def ws_feed(app, ws, queue):
     try:
         while True:
-            op, subject_or_object = await queue.get()
-            if op is 'push':
-                class_, id_ = await app.get_resource(subject_or_object)
-                type_ = app.resources[class_]
-                data = await app.muclresources.get(type_, id_)
-            else:
-                data = {'data': {'id': subject_or_object.value}}
-            ws.send_json({op: data})
+            job = await queue.get()
+            ws.send_json(job)
     except asyncio.CancelledError:
         logger.debug("Stop sending push notifications to %r", ws)
     except Exception:

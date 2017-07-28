@@ -18,6 +18,7 @@ class DeltaTestCase(IntegrationTestCase):
         data = await ws.receive_json()
         self.assertIn('push', data)
         self.assertEqual(data['push']['data']['id'], test_id)
+        self.assertEqual(data['push']['data']['type'], "resource1")
 
     @unittest_run_loop
     async def test_push_many_notifications(self):
@@ -43,9 +44,11 @@ class DeltaTestCase(IntegrationTestCase):
         data1 = await ws.receive_json()
         self.assertIn('push', data1)
         self.assertIn(data1['push']['data']['id'], (test1_id, test2_id))
+        self.assertEqual(data1['push']['data']['type'], "resource1")
         data2 = await ws.receive_json()
         self.assertIn('push', data2)
         self.assertIn(data2['push']['data']['id'], (test1_id, test2_id))
+        self.assertEqual(data2['push']['data']['type'], "resource1")
 
     @unittest_run_loop
     async def test_push_push_and_delete_notifications(self):
@@ -61,7 +64,9 @@ class DeltaTestCase(IntegrationTestCase):
         data1 = await ws.receive_json()
         self.assertIn('push', data1)
         self.assertEqual(data1['push']['data']['id'], test_id)
+        self.assertEqual(data1['push']['data']['type'], "resource1")
         await self.delete_node(test_iri)
         data2 = await ws.receive_json()
         self.assertIn('delete', data2)
         self.assertEqual(data2['delete']['data']['id'], test_id)
+        self.assertEqual(data2['delete']['data']['type'], "resource1")

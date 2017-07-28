@@ -1,6 +1,6 @@
 import logging
 from aiohttp import web
-from aiosparql.syntax import IRI, Literal
+from aiosparql.syntax import IRI, Literal, RDF
 from itertools import groupby
 
 from mupushservice.prefixes import Mu
@@ -109,6 +109,29 @@ def filter_updates(data, resource_type):
     return (inserts, deletes)
 
 
+async def generate_jobs_data(app, inserts, deletes):
+    for s, group in groupby_subject(inserts).items():
+        class_, id_ = await app.get_resource(s)
+        type_ = app.resources[class_]
+        data = await app.muclresources.get(type_, id_)
+        yield {
+            'push': data,
+        }
+
+    for s, group in groupby_subject(deletes).items():
+        values = {
+            triple.p: triple.o
+            for triple in group
+        }
+        if Mu.uuid not in values or RDF.type not in values:
+            continue
+        type_ = app.resources[values[RDF.type]]
+        data = {'data': {'id': values[Mu.uuid].value, 'type': type_}}
+        yield {
+            'delete': data,
+        }
+
+
 async def update(request):
     """
     The API entry point for the Delta service callback
@@ -128,17 +151,8 @@ async def update(request):
     except StopIteration:
         raise web.HTTPNoContent()
 
-    jobs = set([
-        ('push', triple.s)
-        for triple in first_data.inserts
-    ])
-    jobs |= set([
-        ('delete', triple.o)
-        for triple in first_data.deletes
-        if triple.p == Mu.uuid
-    ])
-
-    for job in jobs:
+    async for job in generate_jobs_data(request.app, first_data.inserts,
+                                        first_data.deletes):
         for queue in request.app.queues:
             logger.debug("Added job %r to queue %r", job, queue)
             await queue.put(job)
