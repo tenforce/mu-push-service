@@ -1,8 +1,5 @@
 import asyncio
-import os
-import shutil
 import socket
-import subprocess
 import uuid
 from aiohttp.test_utils import (
     AioHTTPTestCase, TestClient, TestServer, setup_test_loop,
@@ -12,7 +9,7 @@ from aiosparql.syntax import escape_any, IRI, Triples
 from copy import copy
 from yarl import URL
 
-import mupushservice
+import mupushservice.main
 
 __all__ = ['IntegrationTestCase', 'unittest_run_loop']
 
@@ -145,10 +142,6 @@ class IntegrationTestCase(AioHTTPTestCase):
     def tearDown(self):
         self.loop.run_until_complete(self.db.close())
         super().tearDown()
-        for project_name in os.listdir("/data"):
-            project_path = "/data/%s" % project_name
-            subprocess.call(["docker-compose", "down"], cwd=project_path)
-            shutil.rmtree(project_path)
 
     # NOTE: temporary fix, will be fixed with the next aiohttp release
     @asyncio.coroutine

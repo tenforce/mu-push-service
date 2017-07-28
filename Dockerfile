@@ -13,6 +13,4 @@ RUN pip install -r requirements.txt
 
 COPY . /src
 
-VOLUME /data
-
 ENTRYPOINT ["/src/entrypoint.sh"]
