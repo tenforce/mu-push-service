@@ -68,5 +68,5 @@ class DeltaTestCase(IntegrationTestCase):
         await self.delete_node(test_iri)
         data2 = await ws.receive_json()
         self.assertIn('delete', data2)
-        self.assertEqual(data2['delete']['data']['id'], test_id)
-        self.assertEqual(data2['delete']['data']['type'], "resource1")
+        self.assertEqual(data2['delete']['id'], test_id)
+        self.assertEqual(data2['delete']['type'], "resource1")

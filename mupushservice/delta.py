@@ -125,10 +125,10 @@ async def generate_jobs_data(app, inserts, deletes):
         }
         if Mu.uuid not in values or RDF.type not in values:
             continue
+        id_ = values[Mu.uuid].value
         type_ = app.resources[values[RDF.type]]
-        data = {'data': {'id': values[Mu.uuid].value, 'type': type_}}
         yield {
-            'delete': data,
+            'delete': {'id': id_, 'type': type_},
         }
 
 
