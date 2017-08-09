@@ -19,4 +19,4 @@ exec docker run -it --rm \
 	-e MU_CL_RESOURCES_ENDPOINT=http://resources \
 	-v "$PWD":/src \
 	-v "$PWD"/ci/resources:/config \
-	tenforce/mu-push-service:latest "${commands[@]}"
+	tenforce/push-service:latest "${commands[@]}"

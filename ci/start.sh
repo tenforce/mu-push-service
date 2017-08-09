@@ -31,4 +31,4 @@ docker run -d --name=mupushservice_test_resources \
 	-p 8880:80 \
 	semtech/mu-cl-resources:1.15.0
 
-docker pull tenforce/mu-push-service:latest
+docker pull tenforce/push-service:latest

@@ -23,7 +23,7 @@ setup(
     version=version,
     description="A microservice that opens a WebSocket that push messages "
                 "of resource update of mu-cl-resources to the clients",
-    url='https://github.com/tenforce/mu-push-service',
+    url='https://github.com/tenforce/push-service',
     packages=find_packages(exclude=["tests.*", "tests"]),
     install_requires=requirements,
     tests_require=test_requirements,
