@@ -114,9 +114,7 @@ async def generate_jobs_data(app, inserts, deletes):
         class_, id_ = await app.get_resource(s)
         type_ = app.resources[class_]
         data = await app.muclresources.get(type_, id_)
-        yield {
-            'push': data,
-        }
+        yield (type_, {'push': data})
 
     for s, group in groupby_subject(deletes).items():
         values = {
@@ -127,9 +125,7 @@ async def generate_jobs_data(app, inserts, deletes):
             continue
         id_ = values[Mu.uuid].value
         type_ = app.resources[values[RDF.type]]
-        yield {
-            'delete': {'id': id_, 'type': type_},
-        }
+        yield (type_, {'delete': {'id': id_, 'type': type_}})
 
 
 async def update(request):
@@ -151,9 +147,9 @@ async def update(request):
     except StopIteration:
         raise web.HTTPNoContent()
 
-    async for job in generate_jobs_data(request.app, first_data.inserts,
-                                        first_data.deletes):
-        for queue in request.app.queues:
+    async for type_, job in generate_jobs_data(request.app, first_data.inserts,
+                                               first_data.deletes):
+        for queue in request.app.filter_queues(type_):
             logger.debug("Added job %r to queue %r", job, queue)
             await queue.put(job)
 

@@ -64,6 +64,9 @@ class Application(web.Application):
             self._queues = []
         return self._queues
 
+    def filter_queues(self, resource):
+        return filter(lambda x: resource in x.watch_list, self.queues)
+
     async def get_resource(self, subject):
         result = await self.sparql.query(
             """
